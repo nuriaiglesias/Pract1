@@ -88,7 +88,6 @@ int main(void)
   led_red_init();
   sw1_button_init();
   sw2_button_init();
-  Green_LED_On();
   int sw1_state = 0;
   int sw2_state = 0;
   int sw1_count = 0;
@@ -97,7 +96,7 @@ int main(void)
   while (1)
   {
        
-      if (check_SW1()) // SW1 se ha pulsado
+      if (check_SW1()) // SW1 has been pressed
       { 
         sw1_count++;
         if (sw1_count == 2)
@@ -105,10 +104,10 @@ int main(void)
           sw1_state = !sw1_state;
           sw1_count = 0;
         }
-        while (check_SW1()); // Esperar a que el botón se deje de pulsar
+        while (check_SW1()); // Wait until the button stops being pressed
       }
 
-      if (check_SW2()) // SW2 se ha pulsado
+      if (check_SW2()) // SW2 has been pressed
       { 
         sw2_count++;
         if (sw2_count == 2)
@@ -119,17 +118,17 @@ int main(void)
         while (check_SW2());
       }
       
-      if (sw1_state == 0 && sw2_state == 0) // Si ambas puertas están cerradas
+      if (sw1_state == 0 && sw2_state == 0) // If both doors are closed
       {
-        Green_LED_On(); // Encender LED verde
-        Red_LED_Off();  // Apagar LED rojo
+        Green_LED_On(); 
+        Red_LED_Off(); 
         sw1_count = 1;
         sw2_count = 1;
       }
-      else   // Si alguna o ambas puertas están abiertas
+      else   // If one or both doors are opened
       {                  
-        Red_LED_On();    // Encender LED rojo
-        Green_LED_Off(); // Apagar LED verde
+        Red_LED_On();    
+        Green_LED_Off(); 
       }
     }
 
