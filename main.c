@@ -4,6 +4,13 @@
 // LED_GREEN = PTD5
 // LED_RED = PTE29
 
+int first = 0;
+int first2 = 0;
+int sw1_state = 0;
+int sw2_state = 0;
+int sw1_count = 0;
+int sw2_count = 0;
+
 // LED_GREEN = PTD5
 void led_green_init()
 {
@@ -47,15 +54,19 @@ void Red_LED_Off(void)
 void sw1_button_init(void)
 {
   SIM->SCGC5 |= SIM_SCGC5_PORTC_MASK;
-  PORTC->PCR[3] = PORT_PCR_MUX(1) | PORT_PCR_PE(1) | PORT_PCR_PS(1); // set port c pin 3 as GPIO, Pull enable and select
-  GPIOC->PDDR &= ~(1 << 3);                                          // set port c pin 3 as input
+  PORTC->PCR[3] = PORT_PCR_MUX(1) | PORT_PCR_PE(1) | PORT_PCR_PS(1) | PORT_PCR_IRQC(10); 
+  GPIOC->PDDR &= ~(1 << 3);
+  PORTC->ISFR |= (1 << 3);
+  NVIC_SetPriority(PORTC_PORTD_IRQn, 0); 
 }
 
 void sw2_button_init(void)
 {
   SIM->SCGC5 |= SIM_SCGC5_PORTC_MASK;
-  PORTC->PCR[12] = PORT_PCR_MUX(1) | PORT_PCR_PE(1) | PORT_PCR_PS(1); // set port c pin 12 as GPIO, Pull enable and select
+  PORTC->PCR[12] = PORT_PCR_MUX(1) | PORT_PCR_PE(1) | PORT_PCR_PS(1) | PORT_PCR_IRQC(10); // set port c pin 12 as GPIO, Pull enable and select
   GPIOC->PDDR &= ~(1 << 12);
+  PORTC->ISFR |= (1 << 12);     // Detect interruption
+  NVIC_SetPriority(PORTC_PORTD_IRQn, 1);
 }
 
 int check_SW1(void)
@@ -82,22 +93,14 @@ int check_SW2(void)
   }
 }
 
-int main(void)
-{
-  led_green_init();
-  led_red_init();
-  sw1_button_init();
-  sw2_button_init();
-  int sw1_state = 0;
-  int sw2_state = 0;
-  int sw1_count = 0;
-  int sw2_count = 0;
 
-  while (1)
-  {
-       
+void PORTDIntHandler(void){
       if (check_SW1()) // SW1 has been pressed
       { 
+        if(first == 0){
+          sw1_count++;
+          first = 1;
+        }
         sw1_count++;
         if (sw1_count == 2)
         {
@@ -105,10 +108,15 @@ int main(void)
           sw1_count = 0;
         }
         while (check_SW1()); // Wait until the button stops being pressed
+        PORTC->PCR[3] &= ~PORT_PCR_ISF_MASK;
       }
 
       if (check_SW2()) // SW2 has been pressed
       { 
+        if(first2 == 0){
+          sw2_count++;
+          first2 = 1;
+        }
         sw2_count++;
         if (sw2_count == 2)
         {
@@ -116,6 +124,7 @@ int main(void)
           sw2_count = 0;
         }
         while (check_SW2());
+        PORTC->PCR[12] &= ~PORT_PCR_ISF_MASK;
       }
       
       if (sw1_state == 0 && sw2_state == 0) // If both doors are closed
@@ -130,7 +139,19 @@ int main(void)
         Red_LED_On();    
         Green_LED_Off(); 
       }
-    }
+}
+
+
+int main(void)
+{
+  led_green_init();
+  led_red_init();
+  sw1_button_init();
+  sw2_button_init();
+  Green_LED_On();
+  NVIC_EnableIRQ(PORTC_PORTD_IRQn);
+
+  while(1){}
 
     return 0;
   }
