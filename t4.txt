@@ -1,0 +1,74 @@
+TEMA 4: ARQUITECTURA ARM: (Assembler Instruction Format)
+----------------------------------
+
+
+Instrucións ensamblador do ARM Cortex-M0+
+-----------------------------------------
+
+Cortex-M0+ CPU Core <- procesador de nuestro microcontrolador
+
+ARM Cortex-M0: trabaja con el repertorio de instrucciones llamado Thumb (16bits: 50 ins) y Thumb-2 (32 bits: 6 ins)
+
+16 bits: de 0 a 15, hay bits que sirven para operaciones (operation code). Podemos indexar 8 registros diferentes (2^3).
+
+Llamada a subrutina: BL (branch link), el link es que guarda la direccion del registro?
+Subrutina: funcion, se llama y luego espero volver
+
+Endianness: 
+Palabra de memoria: el tamaño especificado
+	- Little Endian: empezando por Byte 0, byte menos significativo, enderezo mas bajo en memoria (arquitecturas CISC)
+	- Big Endian: byte menos significativo, enderezo mas alto en memoria (arquitecturas RISC)
+* Esto no se puede mezclar, o es uno o es otro.
+Instructions are always little-endian, kinetis too
+
+Bus Error: 
+	Alignment: colocar los bytes del registro en la memoria en un orden
+
+Registro 32bits:
+31 <- + significativo
+0 <- - significativo
+Separado en 4 Bytes: 
+	Byte 0 -> LSB Less significative byte
+	Byte 4 -> MSB Most ...
+
+El sufijo S indica: si alguna de estas instrucciones ejecuta alguna de las 31,30,29,28 (overflow...), entonces se hacen, si no tuviese la S da igual que tenga overflow, no se ejecutará (resultado negativo, 0, acarreo, overflow)
+ADD vs. ADDS
+
+MOV $R3,$R7
+MOV $R3,$6
+
+LOAD (LDR vs STR) <- distintos tipos de almacenamiento
+
+	LDR $R3,[$R4, #4] <- es un registro base porque puedo meterle un offset, le estoy sumando 4
+
+a partir de la diapo 22 ya no nos interesa: CPU.pdf
+
+
+Arquitectura ARM
+----------------
+Las subrutinas pueden llevar etiquetas y comentarios:
+	GCC -> mysub: LDR $R3,[$R4, #4] //comentario
+	ARM -> mysub LDR $R3,[$R4, #4] ;comentario
+
+Suma con carry: se va acumulando con el resto de registros
+
+en rojo no está en CORTEX MC0+ <- no las tenemos que mirar
+
+
+	ldr r1, #(1<<5) -> con el # metemos valores literales, está haciendo un desplazamiento
+
+
+PRACTICA 4:
+
+
+
+
+
+
+
+
+
+
+
+
+
