@@ -4,6 +4,7 @@
 
 #include "MKL46Z4.h"
 #include "lcd.h"
+extern int My_Div(int, int);
 
 const static uint8_t LCD_Frontplane_Pin[LCD_NUM_FRONTPLANE_PINS] = {
   LCD_FRONTPLANE0, LCD_FRONTPLANE1, LCD_FRONTPLANE2, LCD_FRONTPLANE3,
@@ -364,6 +365,27 @@ void lcd_display_dec(uint16_t value)
     lcd_set(hundreds.c, 2);
     lcd_set(tens.c, 3);
     lcd_set(ones.c, 4);
+  }
+}
+
+//
+// Displays a 4 Digit number in decimal
+//
+void lcd_display_dec_assembler(uint16_t value)
+{
+  if (value > 9999) {
+    //Display "Err" if value is greater than 4 digits
+    lcd_display_error(0x10);
+  } else {
+    int thousands = My_Div(value, 1000);
+    int hundreds = My_Div(value - thousands*1000, 100);
+    int tens = My_Div(value - thousands*1000 - hundreds*100, 10);
+    int ones = My_Div(value - thousands*1000 - hundreds*100 - tens*10, 1);
+
+    lcd_set(thousands, 1);
+    lcd_set(hundreds, 2);
+    lcd_set(tens, 3);
+    lcd_set(ones, 4);
   }
 }
 

@@ -19,24 +19,28 @@ TARGET=main
 
 SRC=$(wildcard *.c drivers/*.c)
 OBJ=$(patsubst %.c, %.o, $(SRC))
+ASM = asm.o
 
 all: build size
-build: elf srec bin
-elf: $(TARGET).elf
-srec: $(TARGET).srec
-bin: $(TARGET).bin
+build: $(TARGET).elf $(TARGET).srec $(TARGET).bin
 
 clean:
-	$(RM) $(TARGET).srec $(TARGET).elf $(TARGET).bin $(TARGET).map $(OBJ)
+	$(RM) $(TARGET).srec $(TARGET).elf $(TARGET).bin $(TARGET).map $(OBJ) $(ASM)
 
-$(TARGET).elf: $(OBJ)
-	$(LD) $(LDFLAGS) $(OBJ) $(LDLIBS) -o $@
+$(TARGET).elf: $(OBJ) $(ASM)
+	$(CC) $(LDFLAGS) $(OBJ) $(ASM) $(LDLIBS) -o $@
 
-%.srec: %.elf
+$(OBJ): %.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(ASM): %.o: %.s
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(TARGET).srec: $(TARGET).elf
 	$(OBJCOPY) -O srec $< $@
 
-%.bin: %.elf
-	    $(OBJCOPY) -O binary $< $@
+$(TARGET).bin: $(TARGET).elf
+	$(OBJCOPY) -O binary $< $@
 
 size:
 	$(SIZE) $(TARGET).elf

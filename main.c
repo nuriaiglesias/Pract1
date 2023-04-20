@@ -160,7 +160,8 @@ int main(void)
   irclk_ini(); // Enable internal ref clk to use by LCD
 
   lcd_ini();
-  lcd_display_dec(14);
+  //lcd_display_dec(800);
+  lcd_display_dec_assembler(10);
 
   while (1) {}
 
